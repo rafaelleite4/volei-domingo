@@ -218,7 +218,6 @@ select.input option{background:var(--card2);color:var(--text);}
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-logo">🏐 VÔLEI</div>
   <div class="login-sub">Vôlei de Domingo · Rafael & Rebecca</div>
@@ -226,6 +225,10 @@ select.input option{background:var(--card2);color:var(--text);}
     <div class="login-title">Como deseja entrar?</div>
     <div class="login-btns">
       <div>
+        <select class="login-input" id="admin-nome">
+          <option value="Rafael">Rafael</option>
+          <option value="Rebecca">Rebecca</option>
+        </select>
         <input class="login-input" id="admin-senha" type="password" placeholder="Senha do administrador..." />
         <button class="login-btn lb-admin" onclick="loginAdmin()">🔐 Entrar como Admin</button>
       </div>
@@ -269,9 +272,16 @@ select.input option{background:var(--card2);color:var(--text);}
 // ============================================================
 // ESTADO GLOBAL
 // ============================================================
-const ADMIN_PASS = '1234';
-let role = null; // 'admin' ou 'member'
+// USUÁRIOS ADMIN — altere aqui as senhas
+let ADMINS = JSON.parse(localStorage.getItem('vb_admins') || 'null') || [
+  { nome: 'Rafael', senha: '1234' },
+  { nome: 'Rebecca', senha: '1234' },
+];
+function saveAdmins() { localStorage.setItem('vb_admins', JSON.stringify(ADMINS)); }
+
+let role = null;
 let memberName = null;
+let adminName = null;
 
 let state = loadState();
 
@@ -418,12 +428,15 @@ document.getElementById('modal').addEventListener('click', e => {
 // AUTH
 // ============================================================
 function loginAdmin() {
-  const s = document.getElementById('admin-senha').value;
-  if(s !== ADMIN_PASS) { showToast('❌ Senha incorreta!'); return; }
+  const nome = document.getElementById('admin-nome').value;
+  const senha = document.getElementById('admin-senha').value;
+  const admin = ADMINS.find(a => a.nome === nome && a.senha === senha);
+  if(!admin) { showToast('❌ Senha incorreta!'); return; }
   role = 'admin';
+  adminName = nome;
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  document.getElementById('role-badge').textContent = 'ADMIN';
+  document.getElementById('role-badge').textContent = nome.toUpperCase();
   renderApp();
 }
 
@@ -442,7 +455,7 @@ function loginMember() {
 }
 
 function logout() {
-  role = null; memberName = null;
+  role = null; memberName = null; adminName = null;
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   document.getElementById('admin-senha').value = '';
@@ -464,6 +477,7 @@ function renderApp() {
       <button class="tab" onclick="showTab('times',this)">🏐 Times</button>
       <button class="tab" onclick="showTab('rodizio',this)">🔄 Rodízio</button>
       <button class="tab" onclick="showTab('calendario',this)">📅 Calendário</button>
+      <button class="tab" onclick="showTab('config',this)">⚙️ Config</button>
     `;
     showTab('dashboard');
   } else {
@@ -494,6 +508,7 @@ function renderPanel(tab) {
     'times': renderTimes,
     'rodizio': renderRodizio,
     'calendario': renderCalendario,
+    'config': renderConfig,
     'membro-home': renderMembroHome,
     'membro-presenca': renderMembroPresenca,
     'membro-churrasco': renderMembroChurrasco,
@@ -851,15 +866,20 @@ function renderFinanceiro(el) {
   const rod = state.rodadaAtual;
   const fixos = state.jogadores.filter(j=>j.ativo&&j.tipo==='Fixo'&&j.familia>0);
   const pag = rod?.pagamentos || {};
-  const arrecadado = state.caixa.filter(c=>c.tipo==='Entrada').reduce((s,c)=>s+c.valor,0);
-  const gastos = state.caixa.filter(c=>c.tipo==='Saída').reduce((s,c)=>s+c.valor,0);
-  const saldo = arrecadado - gastos;
-  const totalEsperado = fixos.reduce((s,j)=>s+valorFamilia(j.familia),0);
+
+  // Arrecadado = soma dos valores dos jogadores que pagaram (sem duplicar)
   const totalPago = fixos.filter(j=>pag[j.id]==='sim').reduce((s,j)=>s+valorFamilia(j.familia),0);
+  const totalEsperado = fixos.reduce((s,j)=>s+valorFamilia(j.familia),0);
+
+  // Caixa: entradas manuais + pagamentos + saidas
+  const entradasManuais = state.caixa.filter(c=>c.tipo==='Entrada'&&!c.auto).reduce((s,c)=>s+c.valor,0);
+  const gastos = state.caixa.filter(c=>c.tipo==='Saída').reduce((s,c)=>s+c.valor,0);
+  const arrecadado = totalPago + entradasManuais;
+  const saldo = arrecadado - gastos;
 
   el.innerHTML = `
     <div class="metrics metrics-3">
-      <div class="metric"><div class="num fin-verde" style="color:#A5D6A7">R$${arrecadado}</div><div class="lbl">Arrecadado</div></div>
+      <div class="metric"><div class="num" style="color:#A5D6A7">R$${arrecadado}</div><div class="lbl">Arrecadado</div></div>
       <div class="metric"><div class="num" style="color:#EF9A9A">R$${gastos}</div><div class="lbl">Gastos</div></div>
       <div class="metric"><div class="num" style="color:${saldo>=0?'#A5D6A7':'#EF9A9A'}">R$${saldo}</div><div class="lbl">Saldo</div></div>
     </div>
@@ -881,6 +901,7 @@ function renderFinanceiro(el) {
           </span>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:0.75rem;color:var(--muted)">R$${valorFamilia(j.familia)}</span>
+            <button class="btn btn-ghost btn-xs" onclick="modalEditarJogador(${j.id})" title="Editar">✏️</button>
             <button class="btn btn-xs ${pag[j.id]==='sim'?'btn-verde':'btn-ghost'}" onclick="togglePagamento(${j.id})">
               ${pag[j.id]==='sim'?'✓ Pago':'Pagar'}
             </button>
@@ -890,17 +911,22 @@ function renderFinanceiro(el) {
     </div>
 
     <div class="card">
-      <div class="card-title">📊 LANÇAMENTOS</div>
+      <div class="card-title">📊 LANÇAMENTOS EXTRAS</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">Registre aqui gastos e entradas que não são mensalidades (bola, quadra, etc.)</div>
       <button class="btn btn-verde btn-sm btn-block" onclick="modalLancamento()" style="margin-bottom:10px">+ Lançamento</button>
-      ${state.caixa.slice().reverse().map(c=>`
+      ${state.caixa.filter(c=>!c.auto).length===0?`<div class="empty" style="padding:12px">Nenhum lançamento ainda</div>`:''}
+      ${state.caixa.filter(c=>!c.auto).slice().reverse().map(c=>`
         <div class="fin-row">
           <span>
             <div style="font-size:0.85rem">${c.desc}</div>
-            <div style="font-size:0.7rem;color:var(--muted)">${c.data} · ${c.mes||''}</div>
+            <div style="font-size:0.7rem;color:var(--muted)">${c.data}${c.mes?' · '+c.mes:''}</div>
           </span>
-          <span class="fin-val ${c.tipo==='Entrada'?'fin-verde':'fin-vermelho'}">
-            ${c.tipo==='Entrada'?'+':'-'}R$${c.valor}
-          </span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="fin-val ${c.tipo==='Entrada'?'fin-verde':'fin-vermelho'}">
+              ${c.tipo==='Entrada'?'+':'-'}R$${c.valor}
+            </span>
+            <button class="btn btn-xs btn-ghost" onclick="excluirLancamento(${c.id})">✕</button>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -911,25 +937,9 @@ function togglePagamento(id) {
   if(!state.rodadaAtual) { showToast('Abra uma rodada primeiro!'); return; }
   const p = state.rodadaAtual.pagamentos;
   p[id] = p[id]==='sim' ? 'nao' : 'sim';
-  // Registra na caixa se pagou
-  const j = state.jogadores.find(j=>j.id===id);
-  if(p[id]==='sim' && j) {
-    const val = valorFamilia(j.familia);
-    const exists = state.caixa.find(c=>c.jogadorId===id&&c.mes===state.rodadaAtual.data);
-    if(!exists && val>0) {
-      state.caixa.push({
-        id: Date.now(),
-        desc: `Mensalidade - ${j.nome}`,
-        tipo: 'Entrada',
-        valor: val,
-        data: state.rodadaAtual.data,
-        mes: 'Abril 2025',
-        jogadorId: id
-      });
-    }
-  }
   saveState();
   renderPanel('financeiro');
+  showToast(p[id]==='sim' ? '✅ Marcado como pago!' : '↩️ Pagamento removido');
 }
 
 function modalLancamento() {
@@ -962,11 +972,19 @@ function salvarLancamento() {
     tipo: document.getElementById('lc-tipo').value,
     valor: val,
     data: dataFmt,
-    mes: 'Abril 2025'
+    mes: 'Abril 2025',
+    auto: false
   });
   saveState();
   closeModal();
   showToast('✅ Lançamento salvo!');
+  renderPanel('financeiro');
+}
+
+function excluirLancamento(id) {
+  state.caixa = state.caixa.filter(c=>c.id!==id);
+  saveState();
+  showToast('🗑️ Lançamento removido');
   renderPanel('financeiro');
 }
 
@@ -1442,8 +1460,117 @@ function isUltimoDomingo(data) {
   return proxSemana.getMonth() !== data.getMonth();
 }
 
-// INIT
-document.addEventListener('keydown', e=>{if(e.key==='Escape')closeModal();});
+// ============================================================
+// CONFIG
+// ============================================================
+function renderConfig(el) {
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">🔐 ALTERAR SENHA</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:14px">Altere a senha de cada administrador separadamente.</div>
+      ${ADMINS.map((a,i)=>`
+        <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-size:0.85rem;font-weight:500;margin-bottom:8px">👤 ${a.nome}</div>
+          <input class="input" id="senha-atual-${i}" type="password" placeholder="Senha atual..." style="margin-bottom:8px"/>
+          <input class="input" id="senha-nova-${i}" type="password" placeholder="Nova senha..." style="margin-bottom:8px"/>
+          <input class="input" id="senha-conf-${i}" type="password" placeholder="Confirmar nova senha..."/>
+          <button class="btn btn-verde btn-sm" onclick="alterarSenha(${i})">Alterar senha de ${a.nome}</button>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">ℹ️ INFORMAÇÕES DO SISTEMA</div>
+      <div class="fin-row"><span>Total de jogadores</span><span class="fin-val">${state.jogadores.filter(j=>j.ativo).length}</span></div>
+      <div class="fin-row"><span>Rodadas realizadas</span><span class="fin-val">${state.rodadas.length}</span></div>
+      <div class="fin-row"><span>Lançamentos no caixa</span><span class="fin-val">${state.caixa.length}</span></div>
+      <div class="fin-row"><span>Versão</span><span class="fin-val" style="color:var(--muted)">v2.0</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="color:var(--vermelho)">⚠️ ZONA DE PERIGO</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">Ações irreversíveis. Use com cuidado.</div>
+      <button class="btn btn-ghost btn-block" onclick="limparLancamentosDuplicados()" style="margin-bottom:8px">🧹 Limpar lançamentos duplicados</button>
+      <button class="btn btn-ghost btn-block" onclick="resetarRodada()" style="margin-bottom:8px">🔄 Resetar rodada atual</button>
+      <button class="btn btn-vermelho btn-block" onclick="resetarTudo()">🗑️ Resetar todos os dados</button>
+    </div>
+  `;
+}
+
+function alterarSenha(idx) {
+  const atual = document.getElementById(`senha-atual-${idx}`).value;
+  const nova = document.getElementById(`senha-nova-${idx}`).value;
+  const conf = document.getElementById(`senha-conf-${idx}`).value;
+
+  if(atual !== ADMINS[idx].senha) { showToast('❌ Senha atual incorreta!'); return; }
+  if(!nova) { showToast('Digite a nova senha!'); return; }
+  if(nova !== conf) { showToast('❌ Senhas não conferem!'); return; }
+  if(nova.length < 4) { showToast('Senha deve ter pelo menos 4 caracteres!'); return; }
+
+  ADMINS[idx].senha = nova;
+  saveAdmins();
+  showToast(`✅ Senha de ${ADMINS[idx].nome} alterada!`);
+  renderPanel('config');
+}
+
+function limparLancamentosDuplicados() {
+  // Remove todas as entradas automáticas (mensalidades geradas pelo botão pagar)
+  const antes = state.caixa.length;
+  state.caixa = state.caixa.filter(c => !c.jogadorId && c.auto !== true);
+  const depois = state.caixa.length;
+  saveState();
+  showToast(`🧹 ${antes - depois} lançamentos duplicados removidos!`);
+  renderPanel('config');
+}
+
+function resetarRodada() {
+  openModal(`
+    <div class="modal-title">⚠️ RESETAR RODADA <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:0.9rem;margin-bottom:20px;color:var(--muted)">Isso vai fechar a rodada atual e resetar os times e histórico.</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-laranja" style="flex:1" onclick="confirmarResetRodada()">Resetar</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmarResetRodada() {
+  state.rodadaAtual = null;
+  state.times = [];
+  state.fila = [];
+  state.historico = [];
+  state.vitorias = {};
+  saveState();
+  closeModal();
+  showToast('🔄 Rodada resetada!');
+  renderPanel('config');
+}
+
+function resetarTudo() {
+  openModal(`
+    <div class="modal-title" style="color:var(--vermelho)">🗑️ RESETAR TUDO <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:2rem;margin-bottom:8px">⚠️</div>
+      <div style="font-size:0.9rem;margin-bottom:6px;font-weight:500">Tem certeza absoluta?</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px">Todos os dados serão apagados permanentemente. Os jogadores voltarão para a lista padrão.</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-vermelho" style="flex:1" onclick="confirmarResetTudo()">Sim, apagar tudo</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmarResetTudo() {
+  localStorage.removeItem('vb_state_v2');
+  state = defaultState();
+  saveState();
+  closeModal();
+  showToast('🗑️ Dados resetados!');
+  renderPanel('dashboard');
+}
 </script>
 </body>
 </html>
