@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏐 Vôlei Domingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #1B5E20; --verde2: #2E7D32; --verde3: #388E3C;
+  --verde-c: #C8E6C9; --verde-n: #76FF03;
+  --laranja: #E65100; --laranja2: #FF6D00; --laranja-c: #FFF3E0;
+  --amarelo: #F9A825; --amarelo-c: #FFF9C4;
+  --vermelho: #C62828; --vermelho-c: #FFEBEE;
+  --azul: #1565C0; --azul2: #1976D2; --azul-c: #E3F2FD;
+  --cinza: #455A64; --cinza-c: #ECEFF1;
+  --bg: #0a1a0b; --card: #0f1f10; --card2: #162618; --border: #243826;
+  --text: #e8f5e9; --muted: #5a8a5c; --accent: #76FF03;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+/* MODAL DE LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.login-logo{font-family:'Bebas Neue',cursive;font-size:3.5rem;color:var(--verde-n);letter-spacing:4px;margin-bottom:4px;}
+.login-sub{color:var(--muted);font-size:0.85rem;margin-bottom:32px;}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:340px;}
+.login-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;}
+.login-btns{display:flex;flex-direction:column;gap:10px;}
+.login-btn{padding:14px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.lb-admin{background:var(--verde);color:#fff;}
+.lb-admin:hover{background:var(--verde3);}
+.lb-member{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.lb-member:hover{border-color:var(--verde3);}
+.login-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;margin-bottom:10px;}
+.login-input:focus{border-color:var(--verde3);}
+.login-input::placeholder{color:var(--muted);}
+
+/* HEADER */
+.header{background:var(--verde);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--verde3);}
+.header-left h1{font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:2px;color:#fff;line-height:1;}
+.header-left .sub{font-size:0.68rem;color:#A5D6A7;margin-top:1px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.role-badge{font-size:0.68rem;background:rgba(0,0,0,0.3);color:#A5D6A7;padding:3px 8px;border-radius:10px;}
+.logout-btn{background:none;border:none;color:#A5D6A7;font-size:1.1rem;cursor:pointer;padding:4px;}
+
+/* TABS */
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;position:sticky;top:58px;z-index:99;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:0 0 auto;padding:11px 14px;font-size:0.72rem;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* CONTENT */
+.content{padding:14px;max-width:520px;margin:0 auto;padding-bottom:20px;}
+.panel{display:none;animation:fadeIn 0.2s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.card-title{font-family:'Bebas Neue',cursive;font-size:0.95rem;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* MÉTRICAS */
+.metrics{display:grid;gap:8px;margin-bottom:12px;}
+.metrics-2{grid-template-columns:1fr 1fr;}
+.metrics-3{grid-template-columns:repeat(3,1fr);}
+.metrics-4{grid-template-columns:repeat(4,1fr);}
+.metric{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+.metric .num{font-family:'Bebas Neue',cursive;font-size:1.7rem;line-height:1;}
+.metric .lbl{font-size:0.62rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;}
+
+/* BOTÕES */
+.btn{padding:12px 16px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+.btn-block{width:100%;margin-bottom:8px;}
+.btn-verde{background:var(--verde);color:#fff;}
+.btn-verde:hover{background:var(--verde3);}
+.btn-laranja{background:var(--laranja);color:#fff;}
+.btn-amarelo{background:var(--amarelo);color:#000;}
+.btn-vermelho{background:var(--vermelho);color:#fff;}
+.btn-ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--verde3);color:var(--text);}
+.btn-sm{padding:7px 12px;font-size:0.78rem;border-radius:8px;}
+.btn-xs{padding:5px 9px;font-size:0.7rem;border-radius:6px;}
+.btn-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+
+/* INPUTS */
+.input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;margin-bottom:10px;}
+.input:focus{border-color:var(--verde3);}
+.input::placeholder{color:var(--muted);}
+select.input option{background:var(--card2);color:var(--text);}
+.input-row{display:flex;gap:8px;}
+.input-row .input{margin-bottom:0;}
+
+/* LABELS */
+.label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block;}
+
+/* JOGADOR ITEM */
+.jogador-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;transition:all 0.2s;}
+.jogador-item:hover{border-color:var(--verde3);}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.82rem;flex-shrink:0;}
+.jogador-info{flex:1;min-width:0;}
+.jogador-nome{font-size:0.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jogador-meta{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.jogador-acoes{display:flex;gap:5px;flex-shrink:0;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.68rem;font-weight:600;}
+.b-fixo{background:#1B5E2030;color:#81C784;border:1px solid #1B5E2060;}
+.b-avulso{background:#E6510030;color:#FFB74D;border:1px solid #E6510060;}
+.b-apoio{background:#1565C030;color:#64B5F6;border:1px solid #1565C060;}
+.b-sim{background:#1B5E2040;color:#A5D6A7;}
+.b-nao{background:#C6282840;color:#EF9A9A;}
+.b-pago{background:#1B5E2040;color:#A5D6A7;}
+.b-pend{background:#C6282840;color:#EF9A9A;}
+
+/* DIVIDER */
+.divider{font-family:'Bebas Neue',cursive;font-size:0.72rem;letter-spacing:2px;color:var(--muted);margin:12px 0 10px;display:flex;align-items:center;gap:8px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* TIMES */
+.time-card{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px;}
+.time-header{padding:10px 14px;font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:2px;display:flex;align-items:center;justify-content:space-between;}
+.time-body{background:var(--card);padding:10px;}
+.time-player{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;font-size:0.83rem;margin-bottom:4px;}
+.time-player:last-child{margin-bottom:0;}
+.nlvl{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nlvl-A{background:#4CAF50;}
+.nlvl-B{background:#FF7043;}
+.nlvl-C{background:#78909C;}
+
+/* FILA */
+.fila-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:0.83rem;}
+.fila-pos{font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--muted);min-width:18px;}
+
+/* RESULT BTNS */
+.result-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;}
+.result-btns{display:flex;gap:8px;}
+.result-btn{flex:1;padding:14px 8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;}
+.result-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* HIST */
+.hist-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:0.82rem;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:#1B5E20;padding:10px 20px;border-radius:20px;font-weight:600;font-size:0.85rem;opacity:0;transition:all 0.3s;z-index:9999;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:20px 20px 0 0;border:1px solid var(--border);padding:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-title{font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1.5px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;}
+
+/* SCROLL */
+.scroll-list{max-height:50vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+
+/* CHECK */
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.check-item.checked{border-color:var(--verde3);background:#1a3a1b;}
+.check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all 0.2s;}
+.check-item.checked .check-circle{background:var(--verde3);border-color:var(--verde3);}
+
+/* MEMBER VIEW */
+.confirm-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;}
+.confirm-card .big-num{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--accent);}
+.confirm-btns{display:flex;gap:10px;}
+.conf-btn{flex:1;padding:16px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.conf-btn-sim{background:#1B5E20;color:#fff;}
+.conf-btn-nao{background:#C62828;color:#fff;}
+.conf-btn-sim.ativo{background:var(--accent);color:#1B5E20;transform:scale(1.02);}
+.conf-btn-nao.ativo{background:#EF5350;transform:scale(1.02);}
+
+/* STATUS COLORS */
+.t-A{background:#1B5E20;}
+.t-B{background:#0D47A1;}
+.t-C{background:#BF360C;}
+.t-D{background:#4A148C;}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.9rem;}
+.search-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 14px 10px 34px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;}
+.search-input:focus{border-color:var(--verde3);}
+.search-input::placeholder{color:var(--muted);}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-label{font-size:0.85rem;}
+.toggle-sub{font-size:0.72rem;color:var(--muted);}
+
+/* FINANCEIRO */
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+.fin-row:last-child{border-bottom:none;}
+.fin-val{font-weight:600;}
+.fin-verde{color:#A5D6A7;}
+.fin-vermelho{color:#EF9A9A;}
+.fin-amarelo{color:#FFD54F;}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 16px;color:var(--muted);}
+.empty .big{font-size:2.2rem;margin-bottom:8px;}
+
+/* PROGRESS */
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s ease;}
+
+/* NIVEL BTNS */
+.nivel-row{display:flex;gap:4px;}
+.n-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:0.7rem;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.15s;flex-shrink:0;}
+.n-A.on{background:#1B5E20;border-color:#388E3C;color:#fff;}
+.n-B.on{background:#E65100;border-color:#FF6D00;color:#fff;}
+.n-C.on{background:#455A64;border-color:#607D8B;color:#fff;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">🏐 VÔLEI</div>
+  <div class="login-sub">Vôlei de Domingo · Rafael & Rebecca</div>
+  <div class="login-card">
+    <div class="login-title">Como deseja entrar?</div>
+    <div class="login-btns">
+      <div>
+        <input class="login-input" id="admin-senha" type="password" placeholder="Senha do administrador..." />
+        <button class="login-btn lb-admin" onclick="loginAdmin()">🔐 Entrar como Admin</button>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:0.75rem;padding:6px 0;">— ou —</div>
+      <div>
+        <input class="login-input" id="member-nome" placeholder="Seu nome para entrar como membro..." />
+        <button class="login-btn lb-member" onclick="loginMember()">👤 Entrar como Membro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+<div class="header">
+  <div class="header-left">
+    <h1>🏐 Vôlei Domingo</h1>
+    <div class="sub" id="header-sub">Rafael & Rebecca · 17h às 19h</div>
+  </div>
+  <div class="header-right">
+    <span class="role-badge" id="role-badge">ADMIN</span>
+    <button class="logout-btn" onclick="logout()">↩</button>
+  </div>
+</div>
+
+<div class="tabs" id="main-tabs"></div>
+
+<div class="content" id="main-content"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+const ADMIN_PASS = '1234';
+let role = null; // 'admin' ou 'member'
+let memberName = null;
+
+let state = loadState();
+
+function defaultState() {
+  return {
+    jogadores: [
+      {id:1,nome:'Andreza',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:2,nome:'Anna Campano',tipo:'Fixo',familia:0,nivel:'B',ativo:true,obs:'Incluído no pagto de Gabriel'},
+      {id:3,nome:'Bruno TJ Machado',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:4,nome:'Camila Sousa',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:5,nome:'Cris Nega',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+      {id:6,nome:'Daniela Amorim',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:7,nome:'Debora',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:8,nome:'Dinorá Di',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:9,nome:'Edgar Guedes',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+      {id:10,nome:'Edinho Duarte',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:11,nome:'Eliton Cardoso',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:12,nome:'Elton',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+      {id:13,nome:'Fabio Teixeira',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:14,nome:'Gabriel Campano',tipo:'Fixo',familia:3,nivel:'B',ativo:true,obs:'Paga pelos 3 - Fam. Campano'},
+      {id:15,nome:'Gabrielle Araujo',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:16,nome:'Gislene Roberta',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:17,nome:'Graça Dias',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:18,nome:'Grazielle Araujo',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:19,nome:'Guilherme Campano',tipo:'Fixo',familia:0,nivel:'B',ativo:true,obs:'Incluído no pagto de Gabriel'},
+      {id:20,nome:'Ilso',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:21,nome:'Isabella Santos',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:22,nome:'Italo Paiano',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:23,nome:'Jairo',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:24,nome:'Kalyne',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:25,nome:'Leticia Paiano',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:26,nome:'Lilian',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:27,nome:'Marcos Dos Anjos',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:28,nome:'Marcos Vieira',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+      {id:29,nome:'Michel Deziderio',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:30,nome:'Milene Moraes',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+      {id:31,nome:'Miriam Dos Anjos',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:32,nome:'Monaliza De Lira Sousa',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:33,nome:'Murilo Paixão',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:34,nome:'Nancy Guedes',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:35,nome:'Nathalya',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:36,nome:'Nicole Beneit',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:37,nome:'Rebecca Ayumi',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:38,nome:'Renan',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:39,nome:'Renan Rodrigues',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:40,nome:'Renata Teixeira',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:41,nome:'Sara Paiano',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:42,nome:'Sara Raquel',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:43,nome:'Tainá',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:44,nome:'Tamires',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:45,nome:'Vanusa',tipo:'Fixo',familia:0,nivel:'B',ativo:true,obs:'Incluído no pagto de Edinho'},
+      {id:46,nome:'Wagner Sobrinho',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:47,nome:'Andrew Nobrega',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:48,nome:'Bruna',tipo:'Fixo',familia:0,nivel:'B',ativo:true,obs:'Incluído no pagto de Edgar'},
+      {id:49,nome:'Carol',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:50,nome:'David Rosa',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:51,nome:'Emerson Guedes',tipo:'Fixo',familia:3,nivel:'B',ativo:true},
+      {id:52,nome:'Gustavo',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:53,nome:'Jhenny Silva',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:54,nome:'João Lincoln',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:55,nome:'Luiz',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:56,nome:'Mateus Calixto',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:57,nome:'Otávio',tipo:'Avulso',familia:1,nivel:'B',ativo:true},
+      {id:58,nome:'Zé Felipe',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:59,nome:'Debora Esperidião',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:60,nome:'Rafael Leite',tipo:'Fixo',familia:1,nivel:'A',ativo:true},
+      {id:61,nome:'Ester',tipo:'Fixo',familia:1,nivel:'B',ativo:true},
+      {id:62,nome:'Sheila',tipo:'Fixo',familia:2,nivel:'B',ativo:true},
+    ],
+    rodadas: [],
+    rodadaAtual: null,
+    caixa: [
+      {id:1,desc:'Aluguel quadra Abril',tipo:'Saída',valor:750,data:'01/04/2025',mes:'Abril 2025'},
+    ],
+    churrasco: {data:'05/04/2025',confirmados:{}},
+    times: [],
+    fila: [],
+    historico: [],
+    vitorias: {},
+    numTimes: 2,
+    nextId: 63,
+  };
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('vb_state_v2');
+    return s ? JSON.parse(s) : defaultState();
+  } catch(e) { return defaultState(); }
+}
+
+function saveState() {
+  localStorage.setItem('vb_state_v2', JSON.stringify(state));
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function iniciais(nome) {
+  return nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+}
+
+function corAvatar(nivel) {
+  return nivel==='A'?'#1B5E20':nivel==='B'?'#BF360C':'#37474F';
+}
+
+function valorFamilia(familia) {
+  if(familia===0) return 0;
+  if(familia===1) return 30;
+  if(familia===2) return 45;
+  if(familia===3) return 60;
+  return 75;
+}
+
+function labelFamilia(familia) {
+  if(familia===0) return 'Incluído';
+  if(familia===1) return '1 pessoa · R$30';
+  if(familia===2) return 'Casal · R$45';
+  if(familia===3) return 'Família 3 · R$60';
+  return 'Família 4+ · R$75';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2300);
+}
+
+function openModal(html) {
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if(e.target === document.getElementById('modal')) closeModal();
+});
+
+// ============================================================
+// AUTH
+// ============================================================
+function loginAdmin() {
+  const s = document.getElementById('admin-senha').value;
+  if(s !== ADMIN_PASS) { showToast('❌ Senha incorreta!'); return; }
+  role = 'admin';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('role-badge').textContent = 'ADMIN';
+  renderApp();
+}
+
+function loginMember() {
+  const n = document.getElementById('member-nome').value.trim();
+  if(!n) { showToast('Digite seu nome!'); return; }
+  const found = state.jogadores.find(j=>j.nome.toLowerCase()===n.toLowerCase()&&j.ativo);
+  if(!found) { showToast('Nome não encontrado!'); return; }
+  role = 'member';
+  memberName = found.nome;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('role-badge').textContent = found.nome.split(' ')[0].toUpperCase();
+  document.getElementById('header-sub').textContent = `Olá, ${found.nome.split(' ')[0]}! · Domingo 17h`;
+  renderApp();
+}
+
+function logout() {
+  role = null; memberName = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('admin-senha').value = '';
+  document.getElementById('member-nome').value = '';
+}
+
+// ============================================================
+// RENDER APP
+// ============================================================
+function renderApp() {
+  const tabs = document.getElementById('main-tabs');
+  if(role === 'admin') {
+    tabs.innerHTML = `
+      <button class="tab active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+      <button class="tab" onclick="showTab('jogadores',this)">👥 Jogadores</button>
+      <button class="tab" onclick="showTab('presenca',this)">✅ Presença</button>
+      <button class="tab" onclick="showTab('financeiro',this)">💰 Financeiro</button>
+      <button class="tab" onclick="showTab('churrasco',this)">🔥 Churrasco</button>
+      <button class="tab" onclick="showTab('times',this)">🏐 Times</button>
+      <button class="tab" onclick="showTab('rodizio',this)">🔄 Rodízio</button>
+      <button class="tab" onclick="showTab('calendario',this)">📅 Calendário</button>
+    `;
+    showTab('dashboard');
+  } else {
+    tabs.innerHTML = `
+      <button class="tab active" onclick="showTab('membro-home',this)">🏠 Início</button>
+      <button class="tab" onclick="showTab('membro-presenca',this)">✅ Presença</button>
+      <button class="tab" onclick="showTab('membro-churrasco',this)">🔥 Churrasco</button>
+      <button class="tab" onclick="showTab('membro-times',this)">🏐 Times</button>
+    `;
+    showTab('membro-home');
+  }
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderPanel(tab);
+}
+
+function renderPanel(tab) {
+  const c = document.getElementById('main-content');
+  const fns = {
+    'dashboard': renderDashboard,
+    'jogadores': renderJogadores,
+    'presenca': renderPresenca,
+    'financeiro': renderFinanceiro,
+    'churrasco': renderChurrasco,
+    'times': renderTimes,
+    'rodizio': renderRodizio,
+    'calendario': renderCalendario,
+    'membro-home': renderMembroHome,
+    'membro-presenca': renderMembroPresenca,
+    'membro-churrasco': renderMembroChurrasco,
+    'membro-times': renderMembroTimes,
+  };
+  c.innerHTML = `<div class="panel active" id="panel-${tab}"></div>`;
+  if(fns[tab]) fns[tab](document.getElementById(`panel-${tab}`));
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(el) {
+  const jogs = state.jogadores.filter(j=>j.ativo);
+  const fixos = jogs.filter(j=>j.tipo==='Fixo'&&j.familia>0);
+  const avulsos = jogs.filter(j=>j.tipo==='Avulso');
+  const rodada = state.rodadaAtual;
+  const confirmados = rodada ? Object.values(rodada.confirmacoes||{}).filter(v=>v==='sim').length : 0;
+  const arrecadado = state.caixa.filter(c=>c.tipo==='Entrada').reduce((s,c)=>s+c.valor,0);
+  const gastos = state.caixa.filter(c=>c.tipo==='Saída').reduce((s,c)=>s+c.valor,0);
+  const saldo = arrecadado - gastos;
+  const pagamentos = rodada?.pagamentos || {};
+  const pagaram = fixos.filter(j=>pagamentos[j.id]==='sim').length;
+  const pendentes = fixos.filter(j=>pagamentos[j.id]!=='sim').length;
+
+  el.innerHTML = `
+    <div class="metrics metrics-3">
+      <div class="metric"><div class="num" style="color:var(--accent)">${jogs.length}</div><div class="lbl">Total</div></div>
+      <div class="metric"><div class="num" style="color:#81C784">${fixos.length}</div><div class="lbl">Fixos</div></div>
+      <div class="metric"><div class="num" style="color:#FFB74D">${avulsos.length}</div><div class="lbl">Avulsos</div></div>
+    </div>
+    <div class="metrics metrics-3">
+      <div class="metric"><div class="num" style="color:#64B5F6">${confirmados}</div><div class="lbl">Confirmados</div></div>
+      <div class="metric"><div class="num" style="color:#81C784">${pagaram}</div><div class="lbl">Pagaram</div></div>
+      <div class="metric"><div class="num" style="color:#EF9A9A">${pendentes}</div><div class="lbl">Pendentes</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💰 CAIXA</div>
+      <div class="fin-row"><span>Arrecadado</span><span class="fin-val fin-verde">R$ ${arrecadado.toLocaleString('pt-BR')}</span></div>
+      <div class="fin-row"><span>Gastos</span><span class="fin-val fin-vermelho">R$ ${gastos.toLocaleString('pt-BR')}</span></div>
+      <div class="fin-row"><span style="font-weight:600">Saldo</span><span class="fin-val" style="color:${saldo>=0?'#A5D6A7':'#EF9A9A'};font-size:1.1rem">R$ ${saldo.toLocaleString('pt-BR')}</span></div>
+    </div>
+    ${rodada ? `
+    <div class="card">
+      <div class="card-title">📅 DOMINGO ${rodada.data}</div>
+      <div style="font-size:0.85rem;color:var(--muted)">
+        ${confirmados} confirmados · ${state.historico.length} sets jogados
+      </div>
+      <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${Math.min(100,confirmados/24*100)}%"></div></div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">${confirmados}/24 vagas</div>
+    </div>` : `
+    <div class="card">
+      <div style="text-align:center;padding:12px">
+        <div style="font-size:1.5rem;margin-bottom:8px">📅</div>
+        <div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">Nenhuma rodada aberta</div>
+        <button class="btn btn-verde btn-sm" onclick="abrirRodada()">+ Abrir Domingo</button>
+      </div>
+    </div>`}
+    <div class="card">
+      <div class="card-title">🔥 CHURRASCO</div>
+      <div class="fin-row">
+        <span>Data</span>
+        <span style="font-size:0.85rem">${state.churrasco.data || '—'}</span>
+      </div>
+      <div class="fin-row">
+        <span>Confirmados</span>
+        <span class="fin-val" style="color:#FFB74D">${Object.values(state.churrasco.confirmados||{}).filter(v=>v).length}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// JOGADORES
+// ============================================================
+function renderJogadores(el) {
+  const jogs = state.jogadores.filter(j=>j.ativo);
+  el.innerHTML = `
+    <div class="btn-row">
+      <button class="btn btn-verde btn-sm" onclick="modalNovoJogador()">+ Novo Jogador</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Buscar..." oninput="filtrarJogadores(this.value)" />
+    </div>
+    <div id="lista-jogs"></div>
+  `;
+  renderListaJogadores(jogs);
+}
+
+function filtrarJogadores(q) {
+  const f = q.toLowerCase();
+  const jogs = state.jogadores.filter(j=>j.ativo&&j.nome.toLowerCase().includes(f));
+  renderListaJogadores(jogs);
+}
+
+function renderListaJogadores(jogs) {
+  const el = document.getElementById('lista-jogs');
+  if(!jogs.length){el.innerHTML='<div class="empty"><div class="big">👥</div>Nenhum jogador</div>';return;}
+  const sorted = [...jogs].sort((a,b)=>a.nome.localeCompare(b.nome));
+  el.innerHTML = sorted.map(j=>`
+    <div class="jogador-item">
+      <div class="avatar" style="background:${corAvatar(j.nivel)}">${iniciais(j.nome)}</div>
+      <div class="jogador-info">
+        <div class="jogador-nome">${j.nome}</div>
+        <div class="jogador-meta">
+          <span class="badge ${j.tipo==='Fixo'?'b-fixo':j.tipo==='Avulso'?'b-avulso':'b-apoio'}">${j.tipo}</span>
+          &nbsp;${j.familia>0?labelFamilia(j.familia):'Incluído'}
+          ${j.obs?`<br><span style="color:var(--muted);font-size:0.65rem">${j.obs}</span>`:''}
+        </div>
+      </div>
+      <div class="jogador-acoes">
+        <button class="btn btn-ghost btn-xs" onclick="modalEditarJogador(${j.id})">✏️</button>
+        <button class="btn btn-vermelho btn-xs" onclick="excluirJogador(${j.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function modalNovoJogador() {
+  openModal(`
+    <div class="modal-title">➕ NOVO JOGADOR <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <label class="label">Nome</label>
+    <input class="input" id="mj-nome" placeholder="Nome completo..." />
+    <label class="label">Tipo</label>
+    <select class="input" id="mj-tipo">
+      <option value="Fixo">🟢 Fixo</option>
+      <option value="Avulso">🟡 Avulso</option>
+      <option value="Apoiador">❤️ Apoiador</option>
+    </select>
+    <label class="label">Família / Valor</label>
+    <select class="input" id="mj-familia">
+      <option value="1">👤 1 pessoa → R$30/mês</option>
+      <option value="2">👥 Casal → R$45/mês</option>
+      <option value="3">👨‍👩‍👧 Família 3 → R$60/mês</option>
+      <option value="4">👨‍👩‍👧‍👦 Família 4+ → R$75/mês</option>
+      <option value="0">— Incluído em outro pagamento</option>
+    </select>
+    <label class="label">Nível (para sorteio)</label>
+    <select class="input" id="mj-nivel">
+      <option value="A">🟢 A — Avançado</option>
+      <option value="B" selected>🟡 B — Médio</option>
+      <option value="C">⚪ C — Iniciante</option>
+    </select>
+    <label class="label">Observação (opcional)</label>
+    <input class="input" id="mj-obs" placeholder="Ex: Incluído no pagto de Gabriel..." />
+    <button class="btn btn-verde btn-block" onclick="salvarNovoJogador()">✅ Salvar</button>
+  `);
+}
+
+function salvarNovoJogador() {
+  const nome = document.getElementById('mj-nome').value.trim();
+  if(!nome){showToast('Digite o nome!');return;}
+  state.jogadores.push({
+    id: state.nextId++,
+    nome,
+    tipo: document.getElementById('mj-tipo').value,
+    familia: parseInt(document.getElementById('mj-familia').value),
+    nivel: document.getElementById('mj-nivel').value,
+    obs: document.getElementById('mj-obs').value.trim(),
+    ativo: true
+  });
+  saveState();
+  closeModal();
+  showToast('✅ ' + nome + ' adicionado!');
+  renderPanel('jogadores');
+}
+
+function modalEditarJogador(id) {
+  const j = state.jogadores.find(j=>j.id===id);
+  if(!j) return;
+  openModal(`
+    <div class="modal-title">✏️ EDITAR JOGADOR <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <label class="label">Nome</label>
+    <input class="input" id="ej-nome" value="${j.nome}" />
+    <label class="label">Tipo</label>
+    <select class="input" id="ej-tipo">
+      <option value="Fixo" ${j.tipo==='Fixo'?'selected':''}>🟢 Fixo</option>
+      <option value="Avulso" ${j.tipo==='Avulso'?'selected':''}>🟡 Avulso</option>
+      <option value="Apoiador" ${j.tipo==='Apoiador'?'selected':''}>❤️ Apoiador</option>
+    </select>
+    <label class="label">Família / Valor</label>
+    <select class="input" id="ej-familia">
+      <option value="1" ${j.familia===1?'selected':''}>👤 1 pessoa → R$30/mês</option>
+      <option value="2" ${j.familia===2?'selected':''}>👥 Casal → R$45/mês</option>
+      <option value="3" ${j.familia===3?'selected':''}>👨‍👩‍👧 Família 3 → R$60/mês</option>
+      <option value="4" ${j.familia===4?'selected':''}>👨‍👩‍👧‍👦 Família 4+ → R$75/mês</option>
+      <option value="0" ${j.familia===0?'selected':''}>— Incluído em outro pagamento</option>
+    </select>
+    <label class="label">Nível</label>
+    <select class="input" id="ej-nivel">
+      <option value="A" ${j.nivel==='A'?'selected':''}>🟢 A — Avançado</option>
+      <option value="B" ${j.nivel==='B'?'selected':''}>🟡 B — Médio</option>
+      <option value="C" ${j.nivel==='C'?'selected':''}>⚪ C — Iniciante</option>
+    </select>
+    <label class="label">Observação</label>
+    <input class="input" id="ej-obs" value="${j.obs||''}" />
+    <button class="btn btn-verde btn-block" onclick="salvarEditJogador(${id})">✅ Salvar</button>
+  `);
+}
+
+function salvarEditJogador(id) {
+  const j = state.jogadores.find(j=>j.id===id);
+  if(!j) return;
+  j.nome = document.getElementById('ej-nome').value.trim();
+  j.tipo = document.getElementById('ej-tipo').value;
+  j.familia = parseInt(document.getElementById('ej-familia').value);
+  j.nivel = document.getElementById('ej-nivel').value;
+  j.obs = document.getElementById('ej-obs').value.trim();
+  saveState();
+  closeModal();
+  showToast('✅ Salvo!');
+  renderPanel('jogadores');
+}
+
+function excluirJogador(id) {
+  const j = state.jogadores.find(j=>j.id===id);
+  if(!j) return;
+  openModal(`
+    <div class="modal-title">🗑️ EXCLUIR <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:2rem;margin-bottom:8px">⚠️</div>
+      <div style="font-size:0.95rem;margin-bottom:6px">Excluir <b>${j.nome}</b>?</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:20px">Esta ação não pode ser desfeita.</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-vermelho" style="flex:1" onclick="confirmarExclusao(${id})">Sim, excluir</button>
+      </div>
+    </div>
+  `);
+}
+
+function confirmarExclusao(id) {
+  const j = state.jogadores.find(j=>j.id===id);
+  if(!j) return;
+  j.ativo = false;
+  saveState();
+  closeModal();
+  showToast('🗑️ ' + j.nome + ' removido');
+  renderPanel('jogadores');
+}
+
+// ============================================================
+// PRESENÇA
+// ============================================================
+function abrirRodada() {
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  state.rodadaAtual = { data: hoje, confirmacoes: {}, pagamentos: {} };
+  saveState();
+  showToast('📅 Rodada aberta!');
+  renderPanel('presenca');
+}
+
+function renderPresenca(el) {
+  if(!state.rodadaAtual) {
+    el.innerHTML = `
+      <div class="empty"><div class="big">📅</div><p>Nenhuma rodada aberta</p></div>
+      <button class="btn btn-verde btn-block" onclick="abrirRodada()">+ Abrir Domingo</button>
+    `;
+    return;
+  }
+  const rod = state.rodadaAtual;
+  const conf = rod.confirmacoes || {};
+  const confirmados = Object.values(conf).filter(v=>v==='sim').length;
+  const jogs = state.jogadores.filter(j=>j.ativo&&j.tipo!=='Apoiador');
+
+  el.innerHTML = `
+    <div class="metrics metrics-3" style="margin-bottom:12px">
+      <div class="metric"><div class="num" style="color:var(--accent)">${confirmados}</div><div class="lbl">Confirmados</div></div>
+      <div class="metric"><div class="num" style="color:#EF9A9A">${jogs.filter(j=>conf[j.id]==='nao').length}</div><div class="lbl">Não vão</div></div>
+      <div class="metric"><div class="num" style="color:var(--muted)">${jogs.filter(j=>!conf[j.id]).length}</div><div class="lbl">Sem resp.</div></div>
+    </div>
+
+    <div style="background:#1a3a1b;border:1px solid #388E3C60;border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:0.72rem;color:#81C784;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">📲 LINK PARA MEMBROS CONFIRMAREM</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">Compartilhe o arquivo <b style="color:var(--text)">volei_sistema.html</b> no Zap. Cada membro entra pelo próprio nome e confirma presença na aba "Início".</div>
+      <div style="font-size:0.75rem;color:#81C784">✓ Cada membro confirma individualmente · ✓ Admin vê tudo em tempo real</div>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Buscar..." oninput="filtrarPresenca(this.value)" />
+    </div>
+    <div class="divider">ADMIN — MARCAR PRESENÇA MANUALMENTE</div>
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">Use isso apenas quando o membro não conseguir confirmar pelo sistema.</div>
+    <div id="lista-presenca"></div>
+    <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="fecharRodada()">⛔ Fechar rodada</button>
+  `;
+  renderListaPresenca(jogs);
+}
+
+function filtrarPresenca(q) {
+  const f = q.toLowerCase();
+  const jogs = state.jogadores.filter(j=>j.ativo&&j.tipo!=='Apoiador'&&j.nome.toLowerCase().includes(f));
+  renderListaPresenca(jogs);
+}
+
+function renderListaPresenca(jogs) {
+  const el = document.getElementById('lista-presenca');
+  if(!el) return;
+  const conf = state.rodadaAtual?.confirmacoes || {};
+  const sorted = [...jogs].sort((a,b)=>{
+    const oa = conf[a.id]==='sim'?0:conf[a.id]==='nao'?2:1;
+    const ob = conf[b.id]==='sim'?0:conf[b.id]==='nao'?2:1;
+    return oa-ob||a.nome.localeCompare(b.nome);
+  });
+  el.innerHTML = sorted.map(j=>{
+    const v = conf[j.id];
+    return `
+      <div class="jogador-item" style="${v==='sim'?'border-color:#388E3C;background:#1a3a1b':v==='nao'?'border-color:#C6282860;opacity:0.6':''}">
+        <div class="avatar" style="background:${corAvatar(j.nivel)}">${iniciais(j.nome)}</div>
+        <div class="jogador-info">
+          <div class="jogador-nome">${j.nome}</div>
+          <div class="jogador-meta"><span class="badge ${j.tipo==='Fixo'?'b-fixo':'b-avulso'}">${j.tipo}</span></div>
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-xs ${v==='sim'?'btn-verde':'btn-ghost'}" onclick="marcarPresenca(${j.id},'sim')">✓ Sim</button>
+          <button class="btn btn-xs ${v==='nao'?'btn-vermelho':'btn-ghost'}" onclick="marcarPresenca(${j.id},'nao')">✗ Não</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function marcarPresenca(id, val) {
+  if(!state.rodadaAtual) return;
+  state.rodadaAtual.confirmacoes[id] = val;
+  saveState();
+  const jogs = state.jogadores.filter(j=>j.ativo&&j.tipo!=='Apoiador');
+  renderListaPresenca(jogs);
+  const conf = state.rodadaAtual.confirmacoes;
+  const confirmados = Object.values(conf).filter(v=>v==='sim').length;
+  document.querySelector('.metric .num').textContent = confirmados;
+}
+
+function fecharRodada() {
+  if(!confirm('Fechar a rodada atual?')) return;
+  if(state.rodadaAtual) {
+    state.rodadas.push({...state.rodadaAtual});
+  }
+  state.rodadaAtual = null;
+  state.times = [];
+  state.fila = [];
+  state.historico = [];
+  state.vitorias = {};
+  saveState();
+  showToast('✅ Rodada fechada!');
+  renderPanel('presenca');
+}
+
+// ============================================================
+// FINANCEIRO
+// ============================================================
+function renderFinanceiro(el) {
+  const rod = state.rodadaAtual;
+  const fixos = state.jogadores.filter(j=>j.ativo&&j.tipo==='Fixo'&&j.familia>0);
+  const pag = rod?.pagamentos || {};
+  const arrecadado = state.caixa.filter(c=>c.tipo==='Entrada').reduce((s,c)=>s+c.valor,0);
+  const gastos = state.caixa.filter(c=>c.tipo==='Saída').reduce((s,c)=>s+c.valor,0);
+  const saldo = arrecadado - gastos;
+  const totalEsperado = fixos.reduce((s,j)=>s+valorFamilia(j.familia),0);
+  const totalPago = fixos.filter(j=>pag[j.id]==='sim').reduce((s,j)=>s+valorFamilia(j.familia),0);
+
+  el.innerHTML = `
+    <div class="metrics metrics-3">
+      <div class="metric"><div class="num fin-verde" style="color:#A5D6A7">R$${arrecadado}</div><div class="lbl">Arrecadado</div></div>
+      <div class="metric"><div class="num" style="color:#EF9A9A">R$${gastos}</div><div class="lbl">Gastos</div></div>
+      <div class="metric"><div class="num" style="color:${saldo>=0?'#A5D6A7':'#EF9A9A'}">R$${saldo}</div><div class="lbl">Saldo</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💳 PAGAMENTOS DO MÊS</div>
+      <div class="fin-row"><span>Total esperado</span><span class="fin-val fin-amarelo">R$ ${totalEsperado}</span></div>
+      <div class="fin-row"><span>Já pagaram</span><span class="fin-val fin-verde">R$ ${totalPago}</span></div>
+      <div class="fin-row"><span>Falta receber</span><span class="fin-val fin-vermelho">R$ ${totalEsperado - totalPago}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ QUEM PAGOU</div>
+      ${fixos.map(j=>`
+        <div class="fin-row">
+          <span style="display:flex;align-items:center;gap:8px">
+            <div class="avatar" style="width:28px;height:28px;font-size:0.7rem;background:${corAvatar(j.nivel)}">${iniciais(j.nome)}</div>
+            <span style="font-size:0.85rem">${j.nome}</span>
+          </span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:0.75rem;color:var(--muted)">R$${valorFamilia(j.familia)}</span>
+            <button class="btn btn-xs ${pag[j.id]==='sim'?'btn-verde':'btn-ghost'}" onclick="togglePagamento(${j.id})">
+              ${pag[j.id]==='sim'?'✓ Pago':'Pagar'}
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 LANÇAMENTOS</div>
+      <button class="btn btn-verde btn-sm btn-block" onclick="modalLancamento()" style="margin-bottom:10px">+ Lançamento</button>
+      ${state.caixa.slice().reverse().map(c=>`
+        <div class="fin-row">
+          <span>
+            <div style="font-size:0.85rem">${c.desc}</div>
+            <div style="font-size:0.7rem;color:var(--muted)">${c.data} · ${c.mes||''}</div>
+          </span>
+          <span class="fin-val ${c.tipo==='Entrada'?'fin-verde':'fin-vermelho'}">
+            ${c.tipo==='Entrada'?'+':'-'}R$${c.valor}
+          </span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function togglePagamento(id) {
+  if(!state.rodadaAtual) { showToast('Abra uma rodada primeiro!'); return; }
+  const p = state.rodadaAtual.pagamentos;
+  p[id] = p[id]==='sim' ? 'nao' : 'sim';
+  // Registra na caixa se pagou
+  const j = state.jogadores.find(j=>j.id===id);
+  if(p[id]==='sim' && j) {
+    const val = valorFamilia(j.familia);
+    const exists = state.caixa.find(c=>c.jogadorId===id&&c.mes===state.rodadaAtual.data);
+    if(!exists && val>0) {
+      state.caixa.push({
+        id: Date.now(),
+        desc: `Mensalidade - ${j.nome}`,
+        tipo: 'Entrada',
+        valor: val,
+        data: state.rodadaAtual.data,
+        mes: 'Abril 2025',
+        jogadorId: id
+      });
+    }
+  }
+  saveState();
+  renderPanel('financeiro');
+}
+
+function modalLancamento() {
+  openModal(`
+    <div class="modal-title">💰 LANÇAMENTO <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <label class="label">Descrição</label>
+    <input class="input" id="lc-desc" placeholder="Ex: Compra de bola..." />
+    <label class="label">Tipo</label>
+    <select class="input" id="lc-tipo">
+      <option value="Entrada">💚 Entrada</option>
+      <option value="Saída">❤️ Saída</option>
+    </select>
+    <label class="label">Valor (R$)</label>
+    <input class="input" id="lc-valor" type="number" placeholder="0" />
+    <label class="label">Data</label>
+    <input class="input" id="lc-data" type="date" />
+    <button class="btn btn-verde btn-block" onclick="salvarLancamento()">✅ Salvar</button>
+  `);
+}
+
+function salvarLancamento() {
+  const desc = document.getElementById('lc-desc').value.trim();
+  const val = parseFloat(document.getElementById('lc-valor').value);
+  if(!desc||!val){showToast('Preencha todos os campos!');return;}
+  const data = document.getElementById('lc-data').value;
+  const dataFmt = data ? new Date(data+'T12:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+  state.caixa.push({
+    id: Date.now(),
+    desc,
+    tipo: document.getElementById('lc-tipo').value,
+    valor: val,
+    data: dataFmt,
+    mes: 'Abril 2025'
+  });
+  saveState();
+  closeModal();
+  showToast('✅ Lançamento salvo!');
+  renderPanel('financeiro');
+}
+
+// ============================================================
+// CHURRASCO
+// ============================================================
+function renderChurrasco(el) {
+  const ch = state.churrasco;
+  const jogs = state.jogadores.filter(j=>j.ativo);
+  const conf = ch.confirmados || {};
+  const confirmados = Object.values(conf).filter(Boolean).length;
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">🔥 CHURRASCO</div>
+      <label class="label">Data do churrasco</label>
+      <input class="input" id="ch-data" value="${ch.data||''}" placeholder="Ex: 27/04/2025" />
+      <button class="btn btn-verde btn-sm" onclick="salvarDataChurrasco()">Salvar data</button>
+    </div>
+    <div class="metrics metrics-2">
+      <div class="metric"><div class="num" style="color:var(--laranja2)">${confirmados}</div><div class="lbl">Confirmados</div></div>
+      <div class="metric"><div class="num" style="color:#EF9A9A">${jogs.length - confirmados}</div><div class="lbl">Sem confirm.</div></div>
+    </div>
+    <div class="divider">CONFIRMAÇÕES</div>
+    ${jogs.map(j=>`
+      <div class="jogador-item" style="${conf[j.id]?'border-color:#E6510060;background:#2a1500':''}">
+        <div class="avatar" style="background:${corAvatar(j.nivel)}">${iniciais(j.nome)}</div>
+        <div class="jogador-info">
+          <div class="jogador-nome">${j.nome}</div>
+          <div class="jogador-meta"><span class="badge ${j.tipo==='Fixo'?'b-fixo':'b-avulso'}">${j.tipo}</span></div>
+        </div>
+        <button class="btn btn-xs ${conf[j.id]?'btn-laranja':'btn-ghost'}" onclick="toggleChurrasco(${j.id})">
+          ${conf[j.id]?'🔥 Vai':'Confirmar'}
+        </button>
+      </div>
+    `).join('')}
+  `;
+}
+
+function salvarDataChurrasco() {
+  state.churrasco.data = document.getElementById('ch-data').value;
+  saveState();
+  showToast('✅ Data salva!');
+}
+
+function toggleChurrasco(id) {
+  state.churrasco.confirmados[id] = !state.churrasco.confirmados[id];
+  saveState();
+  renderPanel('churrasco');
+}
+
+// ============================================================
+// TIMES
+// ============================================================
+function renderTimes(el) {
+  const rod = state.rodadaAtual;
+  const confirmados = rod ? state.jogadores.filter(j=>rod.confirmacoes[j.id]==='sim') : [];
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">⚙️ CONFIGURAR TIMES</div>
+      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">
+        ${confirmados.length} confirmados · ${Math.floor(confirmados.length/6)} times possíveis
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm ${state.numTimes===2?'btn-verde':''}" onclick="setNumTimes(2)">2 Times</button>
+        <button class="btn btn-ghost btn-sm ${state.numTimes===3?'btn-verde':''}" onclick="setNumTimes(3)">3 Times</button>
+        <button class="btn btn-ghost btn-sm ${state.numTimes===4?'btn-verde':''}" onclick="setNumTimes(4)">4 Times</button>
+      </div>
+      ${confirmados.length < 6 ? `
+        <div style="background:#C6282820;border:1px solid #C6282840;border-radius:8px;padding:10px;font-size:0.82rem;color:#EF9A9A">
+          ⚠️ Precisa de pelo menos 6 confirmados! (${confirmados.length} atualmente)
+        </div>
+      ` : `
+        <button class="btn btn-verde btn-block" onclick="sortearTimes()">🎲 Sortear Times Equilibrados</button>
+      `}
+    </div>
+    <div id="times-resultado"></div>
+  `;
+  if(state.times.length) renderTimesResultado();
+}
+
+function setNumTimes(n) {
+  state.numTimes = n;
+  saveState();
+  renderPanel('times');
+}
+
+function sortearTimes() {
+  const rod = state.rodadaAtual;
+  if(!rod) { showToast('Abra uma rodada!'); return; }
+  const confirmados = state.jogadores.filter(j=>rod.confirmacoes[j.id]==='sim');
+  if(confirmados.length < 6) { showToast('Precisa de pelo menos 6!'); return; }
+
+  const grupos = {A:[],B:[],C:[]};
+  confirmados.forEach(j=>grupos[j.nivel].push({...j}));
+  Object.keys(grupos).forEach(k=>grupos[k].sort(()=>Math.random()-0.5));
+
+  const nomes = ['Time A','Time B','Time C','Time D'];
+  const cores = ['t-A','t-B','t-C','t-D'];
+
+  state.times = Array.from({length:state.numTimes},(_,i)=>({
+    id:i, nome:nomes[i], cor:cores[i], jogadores:[], vitorias:0
+  }));
+
+  const todos = [...grupos.A,...grupos.B,...grupos.C];
+  const maxJ = state.numTimes * 6;
+  let ordem = [];
+  for(let r=0;r<6;r++){
+    if(r%2===0) for(let t=0;t<state.numTimes;t++) ordem.push(t);
+    else for(let t=state.numTimes-1;t>=0;t--) ordem.push(t);
+  }
+
+  todos.slice(0,maxJ).forEach((j,i)=>{
+    if(i<ordem.length) state.times[ordem[i]].jogadores.push(j);
+  });
+
+  state.fila = todos.slice(maxJ);
+  state.vitorias = {};
+  state.times.forEach(t=>state.vitorias[t.id]=0);
+  saveState();
+  renderTimesResultado();
+  showToast('🎲 Times sorteados!');
+}
+
+function renderTimesResultado() {
+  const el = document.getElementById('times-resultado');
+  if(!el||!state.times.length) return;
+  el.innerHTML = `
+    <div class="divider">TIMES</div>
+    ${state.times.map(t=>`
+      <div class="time-card">
+        <div class="time-header ${t.cor}" style="color:#fff">
+          🏐 ${t.nome}
+          <span style="font-family:'DM Sans';font-size:0.75rem;background:rgba(0,0,0,0.3);padding:3px 8px;border-radius:10px">⭐ ${state.vitorias[t.id]||0}x</span>
+        </div>
+        <div class="time-body">
+          ${t.jogadores.map(j=>`
+            <div class="time-player">
+              <div class="nlvl nlvl-${j.nivel}"></div>
+              <span>${j.nome}</span>
+              <span style="margin-left:auto;font-size:0.7rem;color:var(--muted)">${j.nivel}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${state.fila.length?`
+      <div class="divider">FILA DE ESPERA</div>
+      ${state.fila.map((j,i)=>`
+        <div class="fila-item">
+          <div class="fila-pos">${i+1}</div>
+          <div class="nlvl nlvl-${j.nivel}"></div>
+          <span>${j.nome}</span>
+        </div>
+      `).join('')}
+    `:''}
+    <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="sortearTimes()">🔀 Ressortear</button>
+  `;
+}
+
+// ============================================================
+// RODÍZIO
+// ============================================================
+function renderRodizio(el) {
+  if(!state.times.length) {
+    el.innerHTML = `<div class="empty"><div class="big">🏐</div><p>Sorteie os times primeiro!</p></div>`;
+    return;
+  }
+
+  const t0 = state.times[0];
+  const t1 = state.times[1];
+
+  el.innerHTML = `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.82rem;color:var(--muted)">
+      🔄 Regras: perde sai · ganha 2x sai · próximo entra
+    </div>
+
+    <div class="result-card">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">🏆 Quem venceu o set?</div>
+      <div class="result-btns">
+        <button class="result-btn" onclick="registrarVitoria(0)">
+          🏆 ${t0.nome}<br>
+          <span style="font-size:0.7rem;color:var(--muted)">${state.vitorias[t0.id]||0} vitória(s)</span>
+        </button>
+        <button class="result-btn" onclick="registrarVitoria(1)">
+          🏆 ${t1.nome}<br>
+          <span style="font-size:0.7rem;color:var(--muted)">${state.vitorias[t1.id]||0} vitória(s)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="divider">JOGANDO AGORA</div>
+    ${[t0,t1].map(t=>`
+      <div class="time-card">
+        <div class="time-header ${t.cor}" style="color:#fff">
+          🏐 ${t.nome} &nbsp;<span style="font-family:'DM Sans';font-size:0.75rem;background:rgba(0,0,0,0.3);padding:3px 8px;border-radius:10px">⭐ ${state.vitorias[t.id]||0}x</span>
+        </div>
+        <div class="time-body">
+          ${t.jogadores.map(j=>`<div class="time-player"><div class="nlvl nlvl-${j.nivel}"></div><span>${j.nome}</span></div>`).join('')}
+        </div>
+      </div>
+    `).join('')}
+
+    ${state.times.length>2?`
+      <div class="divider">AGUARDANDO</div>
+      ${state.times.slice(2).map(t=>`
+        <div class="fila-item">
+          <div class="nlvl" style="background:#1976D2"></div>
+          <span>${t.nome}</span>
+          <span style="margin-left:auto;font-size:0.75rem;color:var(--muted)">⭐ ${state.vitorias[t.id]||0}x</span>
+        </div>
+      `).join('')}
+    `:''}
+
+    ${state.fila.length?`
+      <div class="divider">FILA INDIVIDUAL</div>
+      ${state.fila.map((j,i)=>`<div class="fila-item"><div class="fila-pos">${i+1}</div><div class="nlvl nlvl-${j.nivel}"></div><span>${j.nome}</span></div>`).join('')}
+    `:''}
+
+    <div class="divider">HISTÓRICO (${state.historico.length} sets)</div>
+    ${state.historico.length?state.historico.slice().reverse().map(h=>`
+      <div class="hist-item">
+        <span class="badge" style="background:#1B5E2040;color:#A5D6A7">Set ${h.set}</span>
+        <span style="flex:1"><b>${h.vencedor}</b> venceu</span>
+        <span style="color:var(--muted);font-size:0.72rem">${h.hora}</span>
+      </div>
+    `).join(''):'<div class="empty" style="padding:12px">Nenhum set ainda</div>'}
+  `;
+}
+
+function registrarVitoria(timeIdx) {
+  if(!state.times.length) return;
+  const vencedor = state.times[timeIdx];
+  const perdedorIdx = timeIdx===0?1:0;
+  const perdedor = state.times[perdedorIdx];
+
+  state.vitorias[vencedor.id] = (state.vitorias[vencedor.id]||0)+1;
+
+  state.historico.push({
+    set: state.historico.length+1,
+    vencedor: vencedor.nome,
+    perdedor: perdedor.nome,
+    hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+  });
+
+  const jogPerdedor = [...perdedor.jogadores];
+  const jogVencedor = [...vencedor.jogadores];
+  const venceuDuas = state.vitorias[vencedor.id]>=2;
+
+  // Perdedor sai
+  state.times.splice(perdedorIdx,1);
+  if(state.times.length>1&&state.fila.length>=6){
+    const novo = {id:Date.now(),nome:['Time A','Time B','Time C','Time D'][Math.floor(Math.random()*4)],cor:['t-A','t-B','t-C','t-D'][Math.floor(Math.random()*4)],jogadores:state.fila.splice(0,6),vitorias:0};
+    state.times.splice(1,0,novo);
+    state.vitorias[novo.id]=0;
+  }
+  state.fila.push(...jogPerdedor);
+
+  // Vencedor ganhou 2x?
+  if(venceuDuas){
+    showToast(`🏆 ${vencedor.nome} ganhou 2x — saindo!`);
+    state.vitorias[vencedor.id]=0;
+    const vencIdx = state.times.findIndex(t=>t.id===vencedor.id);
+    if(vencIdx>=0){
+      state.times.splice(vencIdx,1);
+      if(state.fila.length>=6){
+        const novo={id:Date.now()+1,nome:['Time A','Time B','Time C','Time D'][Math.floor(Math.random()*4)],cor:['t-A','t-B','t-C','t-D'][Math.floor(Math.random()*4)],jogadores:state.fila.splice(0,6),vitorias:0};
+        state.times.push(novo);
+        state.vitorias[novo.id]=0;
+      }
+    }
+    state.fila.push(...jogVencedor);
+  } else {
+    showToast(`✅ ${vencedor.nome} venceu! ${perdedor.nome} saiu.`);
+  }
+
+  saveState();
+  renderPanel('rodizio');
+}
+
+// ============================================================
+// MEMBRO — HOME
+// ============================================================
+function renderMembroHome(el) {
+  const j = state.jogadores.find(j=>j.nome===memberName&&j.ativo);
+  const rod = state.rodadaAtual;
+  const conf = rod?.confirmacoes?.[j?.id];
+  const churrasConf = state.churrasco.confirmados?.[j?.id];
+
+  el.innerHTML = `
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:2rem;margin-bottom:8px">🏐</div>
+      <div style="font-family:'Bebas Neue';font-size:1.4rem;letter-spacing:2px;color:var(--accent)">${memberName.split(' ')[0].toUpperCase()}</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px">
+        <span class="badge ${j?.tipo==='Fixo'?'b-fixo':'b-avulso'}">${j?.tipo||'—'}</span>
+        &nbsp;${j?.familia>0?labelFamilia(j.familia):'Incluído'}
+      </div>
+    </div>
+
+    ${rod?`
+    <div class="confirm-card">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Domingo ${rod.data} — Você vai jogar?</div>
+      <div class="confirm-btns">
+        <button class="conf-btn conf-btn-sim ${conf==='sim'?'ativo':''}" onclick="membroConfirmar('sim')">✓ Vou!</button>
+        <button class="conf-btn conf-btn-nao ${conf==='nao'?'ativo':''}" onclick="membroConfirmar('nao')">✗ Não vou</button>
+      </div>
+      ${conf?`<div style="font-size:0.8rem;color:var(--muted);margin-top:8px;text-align:center">✅ Resposta registrada!</div>`:''}
+    </div>`:`
+    <div class="card" style="text-align:center">
+      <div style="color:var(--muted);font-size:0.85rem">Nenhuma rodada aberta no momento</div>
+    </div>`}
+
+    <div class="card">
+      <div class="card-title">🔥 CHURRASCO</div>
+      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">Data: ${state.churrasco.data||'A definir'}</div>
+      <div class="confirm-btns">
+        <button class="conf-btn conf-btn-sim ${churrasConf?'ativo':''}" onclick="membroConfirmarChurrasco(true)" style="font-size:0.85rem;padding:12px">🔥 Vou!</button>
+        <button class="conf-btn conf-btn-nao ${churrasConf===false?'ativo':''}" onclick="membroConfirmarChurrasco(false)" style="font-size:0.85rem;padding:12px">✗ Não vou</button>
+      </div>
+    </div>
+  `;
+}
+
+function membroConfirmar(val) {
+  const j = state.jogadores.find(j=>j.nome===memberName&&j.ativo);
+  if(!j||!state.rodadaAtual) return;
+  state.rodadaAtual.confirmacoes[j.id] = val;
+  saveState();
+  showToast(val==='sim'?'✅ Confirmado! Até domingo!':'👋 Ok, avisado!');
+  renderPanel('membro-home');
+}
+
+function membroConfirmarChurrasco(val) {
+  const j = state.jogadores.find(j=>j.nome===memberName&&j.ativo);
+  if(!j) return;
+  state.churrasco.confirmados[j.id] = val;
+  saveState();
+  showToast(val?'🔥 Churrasco confirmado!':'👋 Ok, anotado!');
+  renderPanel('membro-home');
+}
+
+// ============================================================
+// MEMBRO — PRESENÇA
+// ============================================================
+function renderMembroPresenca(el) {
+  const rod = state.rodadaAtual;
+  if(!rod){el.innerHTML='<div class="empty"><div class="big">📅</div>Nenhuma rodada aberta</div>';return;}
+  const conf = rod.confirmacoes||{};
+  const confirmados = state.jogadores.filter(j=>conf[j.id]==='sim');
+  el.innerHTML = `
+    <div class="metrics metrics-2">
+      <div class="metric"><div class="num" style="color:var(--accent)">${confirmados.length}</div><div class="lbl">Confirmados</div></div>
+      <div class="metric"><div class="num" style="color:var(--muted)">${Math.max(0,24-confirmados.length)}</div><div class="lbl">Vagas livres</div></div>
+    </div>
+    <div class="progress-bar" style="margin-bottom:16px"><div class="progress-fill" style="width:${Math.min(100,confirmados.length/24*100)}%"></div></div>
+    <div class="divider">CONFIRMADOS (${confirmados.length})</div>
+    ${confirmados.map(j=>`
+      <div class="jogador-item" style="border-color:#388E3C30">
+        <div class="avatar" style="background:${corAvatar(j.nivel)}">${iniciais(j.nome)}</div>
+        <div class="jogador-info">
+          <div class="jogador-nome">${j.nome}</div>
+          <div class="jogador-meta"><span class="badge b-fixo">✓ Confirmado</span></div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ============================================================
+// MEMBRO — CHURRASCO
+// ============================================================
+function renderMembroChurrasco(el) {
+  const ch = state.churrasco;
+  const jogs = state.jogadores.filter(j=>j.ativo&&ch.confirmados?.[j.id]);
+  el.innerHTML = `
+    <div class="confirm-card">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Churrasco</div>
+      <div class="big-num">${jogs.length}</div>
+      <div style="font-size:0.82rem;color:var(--muted)">confirmados · ${ch.data||'Data a definir'}</div>
+    </div>
+    <div class="divider">QUEM VAI (${jogs.length})</div>
+    ${jogs.map(j=>`
+      <div class="jogador-item" style="border-color:#E6510030">
+        <div class="avatar" style="background:#BF360C">${iniciais(j.nome)}</div>
+        <div class="jogador-info">
+          <div class="jogador-nome">${j.nome}</div>
+          <div class="jogador-meta"><span style="color:var(--laranja2);font-size:0.7rem">🔥 Confirmado</span></div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ============================================================
+// MEMBRO — TIMES
+// ============================================================
+function renderMembroTimes(el) {
+  if(!state.times.length){el.innerHTML='<div class="empty"><div class="big">🏐</div>Times ainda não sorteados</div>';return;}
+  el.innerHTML = `
+    <div class="divider">TIMES DO DIA</div>
+    ${state.times.map(t=>`
+      <div class="time-card">
+        <div class="time-header ${t.cor}" style="color:#fff">🏐 ${t.nome}</div>
+        <div class="time-body">
+          ${t.jogadores.map(j=>`<div class="time-player"><div class="nlvl nlvl-${j.nivel}"></div><span>${j.nome}</span></div>`).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${state.fila.length?`
+      <div class="divider">FILA DE ESPERA</div>
+      ${state.fila.map((j,i)=>`<div class="fila-item"><div class="fila-pos">${i+1}</div><div class="nlvl nlvl-${j.nivel}"></div><span>${j.nome}</span></div>`).join('')}
+    `:''}
+  `;
+}
+
+// ============================================================
+// CALENDÁRIO
+// ============================================================
+function renderCalendario(el) {
+  const proxDomingos = [];
+  const hoje = new Date();
+  let d = new Date(hoje);
+  // Encontra próximo domingo
+  while(d.getDay() !== 0) d.setDate(d.getDate()+1);
+  for(let i=0;i<8;i++) {
+    const dd = new Date(d);
+    dd.setDate(d.getDate() + i*7);
+    const isUltimo = isUltimoDomingo(dd);
+    proxDomingos.push({data:dd, isUltimo});
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">📅 PRÓXIMOS DOMINGOS</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Eventos já criados no Google Calendar ✅</div>
+      ${proxDomingos.map(({data,isUltimo})=>{
+        const dataFmt = data.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'});
+        const dataStr = data.toLocaleDateString('pt-BR');
+        return `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="text-align:center;min-width:40px">
+              <div style="font-family:'Bebas Neue';font-size:1.4rem;color:var(--accent);line-height:1">${data.getDate()}</div>
+              <div style="font-size:0.65rem;color:var(--muted)">${data.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase()}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:0.88rem;font-weight:500">🏐 Vôlei de Domingo</div>
+              <div style="font-size:0.72rem;color:var(--muted)">17h às 19h${isUltimo?' · 🔥 Churrasco após o jogo':''}</div>
+            </div>
+            <span style="font-size:0.7rem;background:${isUltimo?'#E6510030':'#1B5E2030'};color:${isUltimo?'#FFB74D':'#81C784'};padding:3px 8px;border-radius:10px">${isUltimo?'🔥 Churras':'🏐 Jogo'}</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">ℹ️ GOOGLE CALENDAR</div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.7">
+        <div style="margin-bottom:8px">✅ Evento <b style="color:var(--text)">🏐 Vôlei de Domingo</b> criado — recorrente todo domingo 17h–19h</div>
+        <div style="margin-bottom:8px">✅ Evento <b style="color:var(--text)">🔥 Churrasco do Vôlei</b> criado — 27/04 17h–21h</div>
+        <div style="margin-bottom:12px">📱 Lembretes automáticos: 24h antes e 2h antes</div>
+        <div style="font-size:0.75rem;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;">
+          💡 Para adicionar ao calendário da Rebecca: compartilhe os eventos com o email dela pelo Google Calendar.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function isUltimoDomingo(data) {
+  const proxSemana = new Date(data);
+  proxSemana.setDate(data.getDate()+7);
+  return proxSemana.getMonth() !== data.getMonth();
+}
+
+// INIT
+document.addEventListener('keydown', e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
